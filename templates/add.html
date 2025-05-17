@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+{% block title %}バイタルサイン入力 — 医療情報システム{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* 医療システム風の落ち着いたカラーパレット */
+  :root {
+    --primary: #2c6b99;    /* 落ち着いた青 */
+    --secondary: #6c8ebf;  /* やや明るい青 */
+    --accent: #5d8aa8;     /* アクセントブルー */
+    --success: #4a7c59;    /* 深い緑 */
+    --light-bg: #f5f7fa;   /* 淡い背景色 */
+    --border: #d1dbe8;     /* 境界線色 */
+    --text: #334155;       /* テキスト色 */
+    --light-text: #64748b; /* 薄いテキスト色 */
+    --hover-row: #f0f7ff;  /* 行のホバー色 */
+  }
+  
+  body {
+    background-color: var(--light-bg);
+    color: var(--text);
+  }
+  
+  .page-header {
+    background-color: white;
+    border-bottom: 1px solid var(--border);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .page-title {
+    color: var(--primary);
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+  
+  .system-info {
+    font-size: 0.8rem;
+    color: var(--light-text);
+  }
+  
+  /* パネルスタイル */
+  .panel-container {
+    background-color: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    margin-bottom: 1.5rem;
+  }
+  
+  .panel-header {
+    background-color: var(--primary);
+    color: white;
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .panel-header-title {
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  
+  .panel-body {
+    padding: 1.5rem;
+  }
+  
+  /* フォーム要素 */
+  .form-row {
+    margin-bottom: 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .form-group {
+    margin-bottom: 1.25rem;
+    flex: 1;
+    min-width: 200px;
+    padding-right: 1rem;
+  }
+  
+  .form-label {
+    display: block;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .required-field::after {
+    content: "*";
+    color: #d32f2f;
+    margin-left: 3px;
+  }
+  
+  .form-control {
+    display: block;
+    width: 100%;
+    height: 2.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    background-color: white;
+  }
+  
+  .form-control:focus {
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 0.2rem rgba(108, 142, 191, 0.15);
+    outline: none;
+  }
+  
+  .form-help-text {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--light-text);
+    font-size: 0.8rem;
+  }
+  
+  /* アクションボタン */
+  .form-footer {
+    background-color: #f8fafc;
+    border-top: 1px solid var(--border);
+    padding: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+  }
+  
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-left: 0.5rem;
+  }
+  
+  .btn-primary:hover {
+    background-color: #235a85;
+  }
+  
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: #f0f2f5;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #e4e8ee;
+  }
+  
+  /* 情報ラベル */
+  .info-label {
+    display: inline-block;
+    background-color: var(--primary);
+    color: white;
+    font-size: 0.8rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    margin-right: 0.5rem;
+  }
+  
+  /* バイタルサイン特有のスタイル */
+  .vitals-icon {
+    color: var(--accent);
+    margin-right: 0.5rem;
+  }
+  
+  .blood-pressure-group {
+    display: flex;
+    align-items: center;
+  }
+  
+  .blood-pressure-control {
+    width: 48%;
+  }
+  
+  .blood-pressure-separator {
+    margin: 0 4%;
+    color: var(--light-text);
+    font-weight: bold;
+    align-self: flex-end;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* 正常値の範囲表示 */
+  .normal-range {
+    display: inline-block;
+    color: var(--success);
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="page-title">
+      <i class="fas fa-clipboard-check" style="margin-right: 0.5rem;"></i>バイタルサイン入力
+    </div>
+    <div class="system-info">
+      <span class="info-label">国保</span>{{ patient.insurance_number }}
+      <span class="info-label">氏名</span>{{ patient.name }}
+    </div>
+  </div>
+  <div class="system-info">
+    医療情報システム | バージョン 2.5.1
+  </div>
+</div>
+
+<div class="panel-container">
+  <div class="panel-header">
+    <div class="panel-header-title">
+      <i class="fas fa-heartbeat" style="margin-right: 0.5rem;"></i>バイタルサイン記録
+    </div>
+    <div style="font-size: 0.8rem;">
+      必須項目<span style="color: #d32f2f;">*</span>を入力してください
+    </div>
+  </div>
+  
+  <form method="post">
+    {% csrf_token %}
+    <div class="panel-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label required-field">測定日時</label>
+          <input class="form-control" type="datetime-local" name="measured" value="{{ current_time }}">
+          <span class="form-help-text">現在時刻が表示されています。必要に応じて調整してください</span>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label required-field">
+            <i class="fas fa-thermometer-half vitals-icon"></i>体温 (℃)
+            <span class="normal-range">標準: 36.0 - 37.2℃</span>
+          </label>
+          <input class="form-control" type="number" step="0.1" min="32" max="43" name="celsius" value="36.7" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-heartbeat vitals-icon"></i>脈拍 (回/分)
+            <span class="normal-range">標準: 60 - 100回/分</span>
+          </label>
+          <input class="form-control" type="number" min="30" max="200" value="80" name="pulse">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-stethoscope vitals-icon"></i>血圧 (mmHg)
+            <span class="normal-range">標準: 90-140 / 60-90 mmHg</span>
+          </label>
+          <div class="blood-pressure-group">
+            <input class="form-control blood-pressure-control" type="number" min="60" max="250" value="120" name="systolic" placeholder="収縮期">
+            <span class="blood-pressure-separator">/</span>
+            <input class="form-control blood-pressure-control" type="number" min="40" max="150" value="80" name="diastolic" placeholder="拡張期">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-weight vitals-icon"></i>体重 (kg)
+          </label>
+          <input class="form-control" type="number" step="0.1" min="0" max="300" value="60" name="weight">
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-footer">
+      <a class="btn-secondary" href="{% url 'detail' patient.pk %}">
+        <i class="fas fa-times" style="margin-right: 0.5rem;"></i>キャンセル
+      </a>
+      <button class="btn-primary" type="submit">
+        <i class="fas fa-save" style="margin-right: 0.5rem;"></i>保存
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Font Awesome の読み込み -->
+<script defer src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
+{% endblock %}

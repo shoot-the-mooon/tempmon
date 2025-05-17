@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% block title %}新規患者登録 — 医療情報システム{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* 医療システム風の落ち着いたカラーパレット */
+  :root {
+    --primary: #2c6b99;    /* 落ち着いた青 */
+    --secondary: #6c8ebf;  /* やや明るい青 */
+    --accent: #5d8aa8;     /* アクセントブルー */
+    --success: #4a7c59;    /* 深い緑 */
+    --light-bg: #f5f7fa;   /* 淡い背景色 */
+    --border: #d1dbe8;     /* 境界線色 */
+    --text: #334155;       /* テキスト色 */
+    --light-text: #64748b; /* 薄いテキスト色 */
+  }
+  
+  body {
+    background-color: var(--light-bg);
+    color: var(--text);
+  }
+  
+  .page-header {
+    background-color: white;
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.05);
+  }
+  
+  .page-title {
+    color: var(--primary);
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+  
+  .system-card {
+    background-color: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  
+  .card-header {
+    background-color: var(--primary);
+    color: white;
+    padding: 0.75rem 1.25rem;
+    font-weight: 500;
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .form-control {
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+  
+  .form-control:focus {
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 0.2rem rgba(108, 142, 191, 0.15);
+  }
+  
+  .form-label {
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .field-group {
+    margin-bottom: 1.25rem;
+  }
+  
+  .btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    font-weight: 500;
+  }
+  
+  .btn-primary:hover {
+    background-color: #235a85;
+    border-color: #235a85;
+  }
+  
+  .btn-secondary {
+    background-color: #f0f2f5;
+    border-color: #d1dbe8;
+    color: var(--text);
+  }
+  
+  .btn-secondary:hover {
+    background-color: #e4e8ee;
+    border-color: #c0cbd9;
+  }
+  
+  .required-field::after {
+    content: "*";
+    color: #d32f2f;
+    margin-left: 3px;
+  }
+  
+  .system-help-text {
+    color: var(--light-text);
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+  }
+  
+  .form-footer {
+    background-color: #f8fafc;
+    border-top: 1px solid var(--border);
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <div class="page-title">
+      <i class="fas fa-user-plus" style="color: var(--primary);"></i> 患者情報登録
+    </div>
+    <div style="color: var(--light-text); font-size: 0.9rem;">
+      新規患者の情報を入力し登録してください
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="system-card">
+        <div class="card-header">
+          新規患者登録
+        </div>
+        <div class="card-body p-4">
+          <form method="post">
+            {% csrf_token %}
+            
+            <div class="row">
+              <div class="col-md-12 field-group">
+                <label class="form-label required-field" for="name">患者氏名</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="例: 田中 太郎" required>
+                <small class="system-help-text">漢字でフルネームを入力してください</small>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 field-group">
+                <label class="form-label required-field" for="birth_date">生年月日</label>
+                <input type="date" class="form-control" id="birth_date" name="birth_date" required>
+              </div>
+              <div class="col-md-6 field-group">
+                <label class="form-label" for="insurance_number">保険者番号</label>
+                <input type="text" class="form-control" id="insurance_number" name="insurance_number" placeholder="例: 01234567">
+                <small class="system-help-text">ハイフンなしで入力してください</small>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 field-group">
+                <label class="form-label" for="first_visit_date">初診日</label>
+                <input type="date" class="form-control" id="first_visit_date" name="first_visit_date">
+              </div>
+              <div class="col-md-6 field-group">
+                <label class="form-label" for="admission_date">入院日</label>
+                <input type="date" class="form-control" id="admission_date" name="admission_date">
+                <small class="system-help-text">外来患者の場合は空欄</small>
+              </div>
+            </div>
+            
+            <div class="form-footer text-end">
+              <a href="{% url 'list' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> キャンセル
+              </a>
+              <button type="submit" class="btn btn-primary ms-2">
+                <i class="fas fa-save"></i> 登録する
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <div class="mt-3 text-center" style="color: var(--light-text); font-size: 0.8rem;">
+        © 2025 医療情報システム | バージョン 2.5.1
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Font Awesome の読み込み -->
+<script defer src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
+{% endblock %}

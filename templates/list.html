@@ -1,0 +1,426 @@
+{% extends "base.html" %}
+{% block title %}患者一覧 — 医療情報システム{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* 医療システム風の落ち着いたカラーパレット */
+  :root {
+    --primary: #2c6b99;    /* 落ち着いた青 */
+    --secondary: #6c8ebf;  /* やや明るい青 */
+    --accent: #5d8aa8;     /* アクセントブルー */
+    --success: #4a7c59;    /* 深い緑 */
+    --light-bg: #f5f7fa;   /* 淡い背景色 */
+    --border: #d1dbe8;     /* 境界線色 */
+    --text: #334155;       /* テキスト色 */
+    --light-text: #64748b; /* 薄いテキスト色 */
+    --hover-row: #f0f7ff;  /* 行のホバー色 */
+  }
+  
+  body {
+    background-color: var(--light-bg);
+    color: var(--text);
+  }
+  
+  .page-header {
+    background-color: white;
+    border-bottom: 1px solid var(--border);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .page-title {
+    color: var(--primary);
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+  
+  .system-info {
+    font-size: 0.8rem;
+    color: var(--light-text);
+  }
+  
+  /* パネルスタイル */
+  .panel-container {
+    background-color: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    margin-bottom: 1.5rem;
+  }
+  
+  .panel-header {
+    background-color: var(--primary);
+    color: white;
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .panel-header-title {
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  
+  .panel-body {
+    padding: 1rem;
+  }
+  
+  /* 検索フォーム */
+  .search-form {
+    background-color: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .input {
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    height: 2.25rem;
+  }
+  
+  .input:focus {
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 0.125rem rgba(108, 142, 191, 0.15);
+  }
+  
+  .btn-primary {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    height: 2.25rem;
+    padding: 0 1rem;
+    font-weight: 500;
+  }
+  
+  .btn-primary:hover {
+    background-color: #235a85;
+  }
+  
+  .btn-secondary {
+    background-color: #f0f2f5;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 3px;
+    height: 2.25rem;
+    padding: 0 1rem;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #e4e8ee;
+  }
+  
+  /* テーブルスタイル */
+  .med-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .med-table th {
+    background-color: #f0f4f8;
+    color: var(--primary);
+    font-weight: 600;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border-bottom: 2px solid var(--border);
+    font-size: 0.9rem;
+  }
+  
+  .med-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    font-size: 0.9rem;
+  }
+  
+  .med-table tr:hover {
+    background-color: var(--hover-row);
+  }
+  
+  .med-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  /* 詳細ボタンの修正 */
+  .btn-action {
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: inline-block;
+    white-space: nowrap;
+    text-decoration: none;
+    text-align: center;
+  }
+  
+  .btn-action:hover {
+    background-color: #4c7994;
+    color: white;
+    text-decoration: none;
+  }
+  
+  /* ページネーション */
+  .pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+  
+  .pagination-item {
+    margin: 0 0.25rem;
+  }
+  
+  .pagination-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text);
+    text-decoration: none;
+  }
+  
+  .pagination-link.is-active {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+  
+  .pagination-link:hover:not(.is-active) {
+    background-color: #f0f2f5;
+  }
+  
+  .pagination-button {
+    padding: 0 0.75rem;
+    height: 2rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background-color: white;
+    color: var(--text);
+    cursor: pointer;
+  }
+  
+  .pagination-button:disabled {
+    color: #a0aec0;
+    background-color: #f8fafc;
+    cursor: not-allowed;
+  }
+  
+  /* フッターボタン - 余白調整 */
+  .footer-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background-color: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+  
+  .record-count {
+    color: var(--light-text);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s;
+  }
+  
+  .action-btn:hover {
+    background-color: #235a85;
+    color: white;
+    text-decoration: none;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="page-title">
+      <i class="fas fa-user-friends" style="margin-right: 0.5rem;"></i>患者一覧
+    </div>
+    <div class="system-info">登録患者の検索・閲覧</div>
+  </div>
+  <div class="system-info">
+    医療情報システム | バージョン 2.5.1
+  </div>
+</div>
+
+<div class="panel-container">
+  <div class="panel-header">
+    <div class="panel-header-title">
+      <i class="fas fa-search" style="margin-right: 0.5rem;"></i>患者検索
+    </div>
+    <div style="font-size: 0.8rem;">
+      名前または保険者番号で検索できます
+    </div>
+  </div>
+  <div class="panel-body">
+    <form method="get" class="search-form">
+      <div style="display: flex;">
+        <div style="flex: 1; margin-right: 0.5rem;">
+          <input class="input" type="text" name="search" placeholder="患者名、保険者番号で検索" value="{{ search_query }}">
+        </div>
+        <div>
+          <button class="btn-primary" type="submit">
+            <i class="fas fa-search" style="margin-right: 0.3rem;"></i>検索
+          </button>
+        </div>
+        {% if search_query %}
+        <div style="margin-left: 0.5rem;">
+          <a href="{% url 'list' %}" class="btn-secondary">
+            <i class="fas fa-times" style="margin-right: 0.3rem;"></i>クリア
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="panel-container">
+  <div class="panel-header">
+    <div class="panel-header-title">
+      <i class="fas fa-table" style="margin-right: 0.5rem;"></i>患者一覧
+    </div>
+    <div style="font-size: 0.8rem;">
+      {% if search_query %}
+      検索結果: {{ page_obj.paginator.count }}件
+      {% else %}
+      全{{ page_obj.paginator.count }}件
+      {% endif %}
+    </div>
+  </div>
+  <div class="panel-body" style="padding: 0;">
+    <table class="med-table">
+      <thead>
+        <tr>
+          <th>保険者番号</th>
+          <th>氏名</th>
+          <th>性別</th>
+          <th>生年月日</th>
+          <th>初診日</th>
+          <th>入院日</th>
+          <th style="width: 100px; text-align: center;">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for patient in page_obj %}
+        <tr>
+          <td>{{ patient.insurance_number|default:"-" }}</td>
+          <td>{{ patient.name|default:"-" }}</td>
+          <td>{{ patient.get_gender_display|default:"-" }}</td>
+          <td>{{ patient.birth_date|date:"Y/m/d"|default:"-" }}</td>
+          <td>{{ patient.first_visit_date|date:"Y/m/d"|default:"-" }}</td>
+          <td>{{ patient.admission_date|date:"Y/m/d"|default:"-" }}</td>
+          <td style="text-align: center;">
+            <a class="btn-action" href="{% url 'detail' patient.pk %}">
+              <i class="fas fa-file-medical" style="margin-right: 0.3rem;"></i>詳細
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 2rem;">
+            {% if search_query %}
+            <div style="color: var(--light-text);">
+              <i class="fas fa-search" style="margin-right: 0.5rem; font-size: 1.2rem;"></i><br>
+              検索条件に一致する患者が見つかりませんでした。
+            </div>
+            {% else %}
+            <div style="color: var(--light-text);">
+              <i class="fas fa-user-slash" style="margin-right: 0.5rem; font-size: 1.2rem;"></i><br>
+              患者が登録されていません。
+            </div>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="pagination-container">
+      {% if page_obj.has_previous %}
+      <a class="pagination-button" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+        <i class="fas fa-chevron-left" style="margin-right: 0.3rem;"></i>前へ
+      </a>
+      {% else %}
+      <button class="pagination-button" disabled>
+        <i class="fas fa-chevron-left" style="margin-right: 0.3rem;"></i>前へ
+      </button>
+      {% endif %}
+
+      <div style="display: flex; margin: 0 0.5rem;">
+        {% for i in page_obj.paginator.page_range %}
+          {% if page_obj.number == i %}
+          <div class="pagination-item">
+            <span class="pagination-link is-active">{{ i }}</span>
+          </div>
+          {% else %}
+          <div class="pagination-item">
+            <a class="pagination-link" href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ i }}</a>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      {% if page_obj.has_next %}
+      <a class="pagination-button" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+        次へ<i class="fas fa-chevron-right" style="margin-left: 0.3rem;"></i>
+      </a>
+      {% else %}
+      <button class="pagination-button" disabled>
+        次へ<i class="fas fa-chevron-right" style="margin-left: 0.3rem;"></i>
+      </button>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="footer-actions">
+  <div>
+    <a class="action-btn" href="{% url 'patient_add' %}">
+      <i class="fas fa-user-plus" style="margin-right: 0.5rem;"></i>患者を登録
+    </a>
+  </div>
+  <div class="record-count">
+    <i class="fas fa-info-circle" style="margin-right: 0.5rem; color: var(--accent);"></i>
+    表示: {{ page_obj|length }}件 / 全{{ page_obj.paginator.count }}件
+  </div>
+</div>
+
+<!-- Font Awesome の読み込み -->
+<script defer src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
+{% endblock %}

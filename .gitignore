@@ -1,0 +1,47 @@
+# Python byte-compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django SQLite database
+*.sqlite3
+
+# Logs
+*.log
+
+# Env files
+.env
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Django static/media files
+media/
+staticfiles/
+
+# IDE/editor directories and files
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# Test/coverage output
+test_*.py
+.coverage
+htmlcov/
+
+# PyInstaller
+dist/
+build/
+
+# mypy
+.mypy_cache/
+
+# celery beat
+celerybeat-schedule
+
+# local settings
+local_settings.py

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}医療情報システム{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <style>
+        :root {
+            --primary: #2c6b99;    /* 落ち着いた青 */
+            --secondary: #6c8ebf;  /* やや明るい青 */
+            --accent: #5d8aa8;     /* アクセントブルー */
+            --success: #4a7c59;    /* 深い緑 */
+            --light-bg: #f5f7fa;   /* 淡い背景色 */
+            --border: #d1dbe8;     /* 境界線色 */
+            --text: #334155;       /* テキスト色 */
+            --light-text: #64748b; /* 薄いテキスト色 */
+            --hover-row: #f0f7ff;  /* 行のホバー色 */
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* ヘッダーナビゲーション */
+        .navbar {
+            background-color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand .navbar-item {
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .navbar-item:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        .navbar-dropdown {
+            border-top: 2px solid var(--accent);
+            box-shadow: 0 8px 16px rgba(10, 10, 10, 0.1);
+        }
+        
+        /* メインコンテンツエリア */
+        .main-content {
+            flex: 1;
+            padding: 1.5rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+        }
+        
+        /* システムステータスバー */
+        .system-status {
+            background-color: white;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+            color: var(--light-text);
+            padding: 0.5rem 0;
+        }
+        
+        .system-status-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .status-item {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 1rem;
+        }
+        
+        .status-icon {
+            margin-right: 0.3rem;
+            color: var(--primary);
+        }
+        
+        /* フッター */
+        .footer {
+            background-color: white;
+            border-top: 1px solid var(--border);
+            padding: 1.5rem 0;
+            color: var(--light-text);
+            font-size: 0.85rem;
+            margin-top: auto;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* ユーティリティクラス */
+        .text-primary {
+            color: var(--primary);
+        }
+        
+        .text-secondary {
+            color: var(--secondary);
+        }
+        
+        .bg-light {
+            background-color: var(--light-bg);
+        }
+        
+        /* 既存のBulmaクラスの上書き */
+        .title {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            color: var(--text);
+            font-weight: 500;
+        }
+        
+        .button.is-info {
+            background-color: var(--primary);
+        }
+        
+        .button.is-info:hover {
+            background-color: #235a85;
+        }
+        
+        .box {
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+        }
+        
+        .table {
+            border: 1px solid var(--border);
+        }
+        
+        .table th {
+            background-color: #f0f4f8;
+            color: var(--primary);
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .table td {
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- システムステータスバー -->
+    <div class="system-status">
+        <div class="container">
+            <div class="system-status-content">
+                <div>
+                    <span class="status-item">
+                        <i class="fas fa-calendar-alt status-icon"></i>
+                        <span id="current-date"></span>
+                    </span>
+                    <span class="status-item">
+                        <i class="fas fa-clock status-icon"></i>
+                        <span id="current-time"></span>
+                    </span>
+                </div>
+                <div>
+                    <span class="status-item">
+                        <i class="fas fa-info-circle status-icon"></i>
+                        医療情報システム バージョン 2.5.1
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="container">
+            <div class="navbar-brand">
+                <a class="navbar-item" href="{% url 'list' %}">
+                    <i class="fas fa-hospital-user" style="margin-right: 0.5rem;"></i>
+                    バイタルサイン管理システム
+                </a>
+                
+                <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a>
+            </div>
+            
+            <div id="navbarBasicExample" class="navbar-menu">
+                <div class="navbar-start">
+                    <a class="navbar-item" href="{% url 'list' %}">
+                        <i class="fas fa-user-friends" style="margin-right: 0.5rem;"></i>
+                        患者一覧
+                    </a>
+                    
+                    <a class="navbar-item" href="{% url 'patient_add' %}">
+                        <i class="fas fa-user-plus" style="margin-right: 0.5rem;"></i>
+                        患者登録
+                    </a>
+                </div>
+                
+                <div class="navbar-end">
+                    <div class="navbar-item">
+                        <div class="buttons">
+                            <a class="button is-light">
+                                <i class="fas fa-question-circle" style="margin-right: 0.5rem;"></i>
+                                ヘルプ
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="main-content">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- フッター -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <span>&copy; 2025 バイタルサイン管理システム</span>
+                </div>
+                <div>
+                    <span class="status-item">
+                        <i class="fas fa-shield-alt status-icon"></i>
+                        医療ネットワーク接続：安全
+                    </span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 現在の日時を表示する
+        function updateDateTime() {
+            const now = new Date();
+            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            
+            document.getElementById('current-date').textContent = now.toLocaleDateString('ja-JP', dateOptions);
+            document.getElementById('current-time').textContent = now.toLocaleTimeString('ja-JP', timeOptions);
+        }
+        
+        // 初回実行
+        updateDateTime();
+        
+        // 1秒ごとに更新
+        setInterval(updateDateTime, 1000);
+        
+        // モバイルメニューの切り替え
+        document.addEventListener('DOMContentLoaded', () => {
+            const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+            
+            if ($navbarBurgers.length > 0) {
+                $navbarBurgers.forEach( el => {
+                    el.addEventListener('click', () => {
+                        const target = el.dataset.target;
+                        const $target = document.getElementById(target);
+                        
+                        el.classList.toggle('is-active');
+                        $target.classList.toggle('is-active');
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
