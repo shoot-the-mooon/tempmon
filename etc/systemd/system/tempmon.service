@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 User=ubuntu
 Group=www-data
-WorkingDirectory=/home/ubuntu/tempmon
+WorkingDirectory=/home/ubuntu/tempmon/tempmon
 Environment=PATH=/home/ubuntu/tempmon/venv/bin
 ExecStart=/home/ubuntu/tempmon/venv/bin/gunicorn \
     --workers 3 \
