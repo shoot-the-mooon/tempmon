@@ -11,8 +11,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-from dotenv import load_dotenv  
-import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,28 +20,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# ───────────── ここから追記 ──────────────
-# .env を読み込む
-load_dotenv(BASE_DIR / '.env')
-
-def env(key: str, default: str | None = None):
-    """シンプルなラッパー（必須キーなら default=None で KeyError を出す）"""
-    value = os.getenv(key, default)
-    if value is None:
-        raise RuntimeError(f"環境変数 {key} が設定されていません")
-    return value
-# ───────────── ここまで追記 ──────────────
-
-# Quick-start development settings - unsuitable for production
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("DJANGO_SECRET_KEY")
+SECRET_KEY = "django-insecure-dnr)+&oasc+p911_j#0p7uf#0vtzvj(e1##5%0#^olc-t3_m^x"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env("DJANGO_DEBUG", "False") == "True"
+DEBUG = True
 
-ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS", "").split(",")
+ALLOWED_HOSTS = ['13.114.230.157','127.0.0.1','localhost']
 
-STATIC_ROOT = BASE_DIR / "static"
+STATIC_ROOT = BASE_DIR / 'static'
+
+
+# Application definition
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -63,8 +50,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = "tempmon.urls"
