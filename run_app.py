@@ -43,7 +43,7 @@ def main():
     setup_backup_dirs()
     
     # 環境変数の設定
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tempmon.settings_prod')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tempmon.settings')
     
     # 開発サーバーを起動
     if len(sys.argv) > 1 and sys.argv[1] == 'runserver':

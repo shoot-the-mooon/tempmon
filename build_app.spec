@@ -49,7 +49,7 @@ a = Analysis(
         ('templates', 'templates'),
         ('static',    'static'),
         ('tools',     'tools'),
-        ('db.sqlite3','db.sqlite3'),
+        ('db.sqlite3','.'),
         ('backup',    'backup'),
     ] + extra_datas,
     hiddenimports=[
